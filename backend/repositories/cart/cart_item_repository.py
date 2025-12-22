@@ -7,6 +7,5 @@ class CartItemRepository:
         return CartItem.query.filter_by(cart_id=cart_id, product_id=product_id).first()
 
     @staticmethod
-    def delete_cart_item(cart_item: CartItem) -> None:
-        db.session.delete(cart_item)
+    def update_cart_item(cart_item: CartItem) -> None:
         db.session.commit()
