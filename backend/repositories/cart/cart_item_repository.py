@@ -9,3 +9,8 @@ class CartItemRepository:
     @staticmethod
     def update_cart_item(cart_item: CartItem) -> None:
         db.session.commit()
+
+    @staticmethod
+    def delete_cart_item(cart_item: CartItem) -> None:
+        db.session.delete(cart_item)
+        db.session.commit()
