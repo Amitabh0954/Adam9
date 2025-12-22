@@ -1,6 +1,7 @@
+from backend.models.cart import Cart
+from backend.models import db
 from backend.repositories.cart.cart_repository import CartRepository
-from backend.models.cart import Cart, CartItem
-from backend.models.product import Product
+from backend.repositories.cart.cart_item_repository import CartItemRepository
 
 class CartService:
     @staticmethod
@@ -21,3 +22,18 @@ class CartService:
         if not product:
             raise ValueError("Product not found")
         return CartRepository.add_item_to_cart(cart, product_id, quantity)
+
+    @staticmethod
+    def save_cart_state(user_id: int, cart_id: int) -> None:
+        cart = CartRepository.get_cart(cart_id)
+        if not cart or cart.user_id != user_id:
+            raise ValueError("Cart not found or access denied")
+        # Persist the cart with associated user id
+        db.session.commit()
+
+    @staticmethod
+    def retrieve_saved_cart(user_id: int) -> Cart:
+        cart = Cart.query.filter_by(user_id=user_id).first()
+        if not cart:
+            raise ValueError("No saved cart for user")
+        return cart
