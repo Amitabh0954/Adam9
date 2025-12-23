@@ -45,3 +45,14 @@ class CartRepository:
 
         db.session.delete(cart_item)
         db.session.commit()
+
+    @staticmethod
+    def modify_quantity(cart_id: int, product_id: int, quantity: int) -> None:
+        cart_item = CartItem.query.filter_by(cart_id=cart_id, product_id=product_id).first()
+        if not cart_item:
+            raise ValueError('Cart item not found')
+        if quantity <= 0:
+            raise ValueError('Quantity must be a positive integer')
+
+        cart_item.quantity = quantity
+        db.session.commit()
