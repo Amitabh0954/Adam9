@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from backend.services.products.product_service import ProductService
+from backend.services.products.category_service import CategoryService
 
 product_bp = Blueprint('product', __name__)
 
@@ -9,11 +10,18 @@ def add_product():
     name = data.get('name')
     description = data.get('description')
     price = data.get('price')
+    category_ids = data.get('category_ids', [])
     
     if not name or not description or price is None or price <= 0:
         return jsonify({'error': 'Invalid product data'}), 400
     
     product = ProductService.add_product(name, description, price)
+    
+    for category_id in category_ids:
+        category = CategoryService.get_category_by_id(category_id)
+        if category:
+            CategoryService.add_product_to_category(product, category)
+    
     return jsonify({'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price})
 
 @product_bp.route('/products', methods=['GET'])
@@ -34,11 +42,18 @@ def update_product(product_id: int):
     name = data.get('name')
     description = data.get('description')
     price = data.get('price')
+    category_ids = data.get('category_ids', [])
     
     if not name or not description or price is None or price <= 0:
         return jsonify({'error': 'Invalid product data'}), 400
     
     product = ProductService.update_product(product_id, name, description, price)
+    
+    for category_id in category_ids:
+        category = CategoryService.get_category_by_id(category_id)
+        if category:
+            CategoryService.add_product_to_category(product, category)
+    
     if product:
         return jsonify({'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price})
     return jsonify({'error': 'Product not found'}), 404
