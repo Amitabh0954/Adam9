@@ -13,6 +13,10 @@ class CartService:
         return CartRepository.get_cart(cart_id)
 
     @staticmethod
+    def get_cart_by_user_id(user_id: int) -> Cart:
+        return CartRepository.get_cart_by_user_id(user_id)
+
+    @staticmethod
     def add_to_cart(cart_id: int, product_id: int, quantity: int = 1) -> None:
         CartRepository.add_to_cart(cart_id, product_id, quantity)
 
