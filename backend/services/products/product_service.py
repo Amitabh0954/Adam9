@@ -11,4 +11,8 @@ class ProductService:
     @staticmethod
     def update_product(product_id: int, name: str, description: str, price: float) -> Product:
         return ProductRepository.update_product(product_id, name, description, price)
+
+    @staticmethod
+    def delete_product(product_id: int) -> None:
+        return ProductRepository.delete_product(product_id)
 ```
