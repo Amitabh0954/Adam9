@@ -17,4 +17,8 @@ class ProductService:
     @staticmethod
     def delete_product(product_id: int) -> None:
         ProductRepository.delete_product(product_id)
+
+    @staticmethod
+    def search_products(query: str, page: int = 1, per_page: int = 10):
+        return ProductRepository.search_products(query, page, per_page)
 ```
