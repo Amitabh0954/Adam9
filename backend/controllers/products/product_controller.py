@@ -9,18 +9,20 @@ def add_product():
     name = data.get('name')
     description = data.get('description')
     price = data.get('price')
+    category_id = data.get('category_id')
 
-    if not name or not description or price is None:
-        return jsonify({'error': 'Product name, description, and price are required'}), 400
+    if not name or not description or price is None or not category_id:
+        return jsonify({'error': 'Product name, description, price, and category are required'}), 400
 
     try:
-        product = ProductService.add_product(name, description, price)
+        product = ProductService.add_product(name, description, price, category_id)
         return jsonify({
             'message': 'Product added successfully',
             'product_id': product.id,
             'name': product.name,
             'description': product.description,
-            'price': product.price
+            'price': product.price,
+            'category_id': product.category_id
         }), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
@@ -31,41 +33,54 @@ def update_product(product_id):
     name = data.get('name')
     description = data.get('description')
     price = data.get('price')
+    category_id = data.get('category_id')
 
     try:
-        product = ProductService.update_product(product_id, name, description, price)
+        product = ProductService.update_product(product_id, name, description, price, category_id)
         return jsonify({
             'message': 'Product updated successfully',
             'product_id': product.id,
             'name': product.name,
             'description': product.description,
-            'price': product.price
+            'price': product.price,
+            'category_id': product.category_id
         }), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 
-@product_bp.route('/products/<int:product_id>', methods=['DELETE'])
-def delete_product(product_id):
+@product_bp.route('/categories', methods=['POST'])
+def add_category():
+    data = request.json
+    name = data.get('name')
+    parent_id = data.get('parent_id')
+
+    if not name:
+        return jsonify({'error': 'Category name is required'}), 400
+
     try:
-        ProductService.delete_product(product_id)
-        return jsonify({'message': 'Product deleted successfully'}), 200
+        category = ProductService.add_category(name, parent_id)
+        return jsonify({
+            'message': 'Category added successfully',
+            'category_id': category.id,
+            'name': category.name,
+            'parent_id': category.parent_id
+        }), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 
-@product_bp.route('/products/search', methods=['GET'])
-def search_products():
-    query = request.args.get('query')
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
+@product_bp.route('/categories/<int:category_id>', methods=['PATCH'])
+def update_category(category_id):
+    data = request.json
+    name = data.get('name')
+    parent_id = data.get('parent_id')
 
-    if not query:
-        return jsonify({'error': 'Search query is required'}), 400
-
-    products, total = ProductService.search_products(query, page, per_page)
-
-    return jsonify({
-        'products': [{'id': p.id, 'name': p.name, 'description': p.description, 'price': p.price} for p in products],
-        'total': total,
-        'page': page,
-        'per_page': per_page
-    }), 200
+    try:
+        category = ProductService.update_category(category_id, name, parent_id)
+        return jsonify({
+            'message': 'Category updated successfully',
+            'category_id': category.id,
+            'name': category.name,
+            'parent_id': category.parent_id
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
