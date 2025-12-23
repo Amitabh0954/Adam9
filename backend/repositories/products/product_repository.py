@@ -41,3 +41,11 @@ class ProductRepository:
         
         db.session.commit()
         return product
+
+    @staticmethod
+    def delete_product(product_id: int) -> None:
+        product = Product.query.get(product_id)
+        if not product:
+            raise ValueError('Product not found')
+        db.session.delete(product)
+        db.session.commit()
