@@ -50,3 +50,12 @@ def delete_product(product_id: int):
     if product:
         return jsonify({'message': 'Product deleted successfully'})
     return jsonify({'error': 'Product not found'}), 404
+
+@product_bp.route('/products/search', methods=['GET'])
+def search_products():
+    query = request.args.get('query')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    products = ProductService.search_products(query, page, per_page)
+    return jsonify([{'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price} for product in products])
