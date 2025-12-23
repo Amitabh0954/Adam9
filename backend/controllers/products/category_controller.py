@@ -1,20 +1,23 @@
 from flask import Blueprint, request, jsonify
 from backend.services.products.category_service import CategoryService
+from backend.models.product import Product
+from backend.models.category import Category
 
-category_bp = Blueprint('categories', __name__)
+category_bp = Blueprint('category', __name__)
 
-@category_bp.route('/add', methods=['POST'])
+@category_bp.route('/categories', methods=['POST'])
 def add_category():
-    data = request.get_json()
+    data = request.json
     name = data.get('name')
     parent_id = data.get('parent_id')
-    try:
-        category = CategoryService.add_category(name, parent_id)
-        return jsonify({"message": "Category added successfully", "category": category.name}), 201
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
+    
+    if not name:
+        return jsonify({'error': 'Category name is required'}), 400
+    
+    category = CategoryService.add_category(name, parent_id)
+    return jsonify({'id': category.id, 'name': category.name, 'parent_id': category.parent_id})
 
-@category_bp.route('/all', methods=['GET'])
+@category_bp.route('/categories', methods=['GET'])
 def get_all_categories():
     categories = CategoryService.get_all_categories()
-    return jsonify([{'id': category.id, 'name': category.name, 'parent_id': category.parent_id} for category in categories]), 200
+    return jsonify([{'id': category.id, 'name': category.name, 'parent_id': category.parent_id} for category in categories])
