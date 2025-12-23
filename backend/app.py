@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_session import Session
+from flask_mail import Mail
 from backend.config.config import Config
 from backend.models.user import db
 from backend.models.product import Product
@@ -15,6 +16,8 @@ from backend.controllers.products.product_controller import product_bp
 from backend.controllers.cart.cart_controller import cart_bp
 from backend.controllers.products.category_controller import category_bp
 
+mail = Mail()
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -22,6 +25,7 @@ def create_app():
     
     db.init_app(app)
     Session(app)
+    mail.init_app(app)
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(login_bp, url_prefix='/api/auth')
