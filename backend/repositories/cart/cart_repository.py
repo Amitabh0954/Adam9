@@ -8,10 +8,9 @@ class CartRepository:
     
     @staticmethod
     def get_cart(user_id: int = None) -> Cart:
-        if user_id:
-            cart = Cart.query.filter_by(user_id=user_id).first()
-        else:
-            cart = Cart()
+        cart = Cart.query.filter_by(user_id=user_id).first()
+        if not cart and user_id:
+            cart = Cart(user_id=user_id)
             db.session.add(cart)
             db.session.commit()
         return cart
@@ -43,3 +42,10 @@ class CartRepository:
         cart_item.quantity = quantity
         db.session.commit()
         return cart_item
+
+    @staticmethod
+    def get_cart_items(user_id: int) -> list:
+        cart = Cart.query.filter_by(user_id=user_id).first()
+        if not cart:
+            raise ValueError('No cart found for the user')
+        return cart.items
