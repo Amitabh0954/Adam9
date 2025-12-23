@@ -53,3 +53,19 @@ def update_cart_item_quantity(item_id):
         }), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
+
+@cart_bp.route('/cart/<int:user_id>', methods=['GET'])
+def retrieve_cart(user_id):
+    try:
+        cart_items = CartService.get_cart_items(user_id)
+        return jsonify({
+            'cart_items': [
+                {
+                    'cart_id': item.cart_id,
+                    'product_id': item.product_id,
+                    'quantity': item.quantity
+                } for item in cart_items
+            ]
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
