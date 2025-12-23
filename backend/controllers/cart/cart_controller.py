@@ -23,11 +23,20 @@ def add_to_cart(cart_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 
+@cart_bp.route('/cart/<int:cart_id>/items/<int:product_id>', methods=['DELETE'])
+def remove_from_cart(cart_id, product_id):
+    try:
+        CartService.remove_from_cart(cart_id, product_id)
+        return jsonify({'message': 'Product removed from cart', 'cart_id': cart_id, 'product_id': product_id}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
 @cart_bp.route('/cart/<int:cart_id>', methods=['GET'])
 def get_cart(cart_id):
     cart = CartService.get_cart(cart_id)
     if not cart:
         return jsonify({'error': 'Cart not found'}), 404
 
-    items = [{'product_id': item.product_id, 'quantity': item.quantity} for item in cart.items]
-    return jsonify({'cart_id': cart.id, 'user_id': cart.user_id, 'items': items}), 200
+    items = [{'product_id': item.product_id, 'quantity': item.quantity, 'price': item.product.price, 'total': item.product.price * item.quantity} for item in cart.items]
+    total_price = sum(item['total'] for item in items)
+    return jsonify({'cart_id': cart.id, 'user_id': cart.user_id, 'items': items, 'total_price': total_price}), 200
