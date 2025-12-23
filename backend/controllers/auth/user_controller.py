@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from backend.services.auth.user_service import UserService
 
 auth_bp = Blueprint('auth', __name__)
@@ -17,3 +17,24 @@ def register():
         return jsonify({'message': 'User registered successfully', 'user_id': user.id}), 201
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
+
+@auth_bp.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required'}), 400
+
+    user = UserService.authenticate_user(email, password)
+    if not user:
+        return jsonify({'error': 'Invalid email or password'}), 401
+
+    session['user_id'] = user.id
+    return jsonify({'message': 'Logged in successfully', 'user_id': user.id}), 200
+
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    session.pop('user_id', None)
+    return jsonify({'message': 'Logged out successfully'}), 200
