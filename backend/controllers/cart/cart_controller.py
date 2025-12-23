@@ -23,3 +23,16 @@ def remove_item_from_cart(cart_item_id: int):
     if cart_item:
         return jsonify({'message': 'Item removed successfully'})
     return jsonify({'error': 'Item not found'}), 404
+
+@cart_bp.route('/cart/<int:cart_item_id>', methods=['PUT'])
+def modify_item_quantity(cart_item_id: int):
+    data = request.json
+    quantity = data.get('quantity')
+    
+    if quantity is None or quantity <= 0:
+        return jsonify({'error': 'Invalid quantity'}), 400
+    
+    cart_item = CartService.modify_item_quantity(cart_item_id, quantity)
+    if cart_item:
+        return jsonify({'id': cart_item.id, 'product_id': cart_item.product_id, 'quantity': cart_item.quantity})
+    return jsonify({'error': 'Item not found'}), 404
