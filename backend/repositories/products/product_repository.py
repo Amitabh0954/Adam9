@@ -20,3 +20,13 @@ class ProductRepository:
     @staticmethod
     def get_product_by_id(product_id: int) -> Product:
         return Product.query.get(product_id)
+    
+    @staticmethod
+    def update_product(product_id: int, name: str, description: str, price: float) -> Product:
+        product = Product.query.get(product_id)
+        if product:
+            product.name = name
+            product.description = description
+            product.price = price
+            db.session.commit()
+        return product
