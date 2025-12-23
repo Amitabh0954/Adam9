@@ -1,14 +1,22 @@
 from backend.models.product import Product
-from backend.models import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 class ProductRepository:
+    """Repository for the Product model"""
+    
     @staticmethod
-    def get_product_by_name(name: str) -> Product:
-        return Product.query.filter_by(name=name).first()
-
-    @staticmethod
-    def create_product(name: str, description: str, price: float) -> Product:
-        new_product = Product(name=name, description=description, price=price)
-        db.session.add(new_product)
+    def add_product(name: str, description: str, price: float) -> Product:
+        product = Product(name=name, description=description, price=price)
+        db.session.add(product)
         db.session.commit()
-        return new_product
+        return product
+    
+    @staticmethod
+    def get_all_products() -> list[Product]:
+        return Product.query.all()
+    
+    @staticmethod
+    def get_product_by_id(product_id: int) -> Product:
+        return Product.query.get(product_id)
