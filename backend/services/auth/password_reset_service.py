@@ -1,34 +1,25 @@
-from datetime import datetime, timedelta
 import uuid
+from backend.repositories.auth.password_reset_repository import PasswordResetRepository, PasswordReset
 from backend.repositories.auth.user_repository import UserRepository
 from backend.models.user import User
 
 class PasswordResetService:
-    reset_tokens = {}
-
+    """Service class for password reset operations"""
+    
     @staticmethod
-    def generate_reset_token(email: str) -> str:
-        user = UserRepository.get_user_by_email(email)
-        if not user:
-            raise ValueError("Email not found")
+    def request_password_reset(email: str) -> PasswordReset:
         token = str(uuid.uuid4())
-        PasswordResetService.reset_tokens[token] = {
-            'user_id': user.id,
-            'expires_at': datetime.utcnow() + timedelta(hours=24)
-        }
-        return token
-
+        password_reset = PasswordResetRepository.create_password_reset(email, token)
+        return password_reset
+    
     @staticmethod
-    def validate_reset_token(token: str) -> int:
-        token_data = PasswordResetService.reset_tokens.get(token)
-        if not token_data or token_data['expires_at'] < datetime.utcnow():
-            raise ValueError("Invalid or expired token")
-        return token_data['user_id']
-
-    @staticmethod
-    def reset_password(token: str, new_password: str) -> None:
-        user_id = PasswordResetService.validate_reset_token(token)
-        user = UserRepository.get_user_by_id(user_id)
-        user.set_password(new_password)
-        UserRepository.save_user(user)
-        del PasswordResetService.reset_tokens[token]
+    def reset_password(token: str, new_password: str) -> bool:
+        password_reset = PasswordResetRepository.get_password_reset_by_token(token)
+        if password_reset and password_reset.expires_at > datetime.utcnow():
+            user = UserRepository.get_user_by_email(password_reset.email)
+            if user:
+                user.password = new_password
+                db.session.commit()
+                PasswordResetRepository.delete_password_reset(token)
+                return True
+        return False
