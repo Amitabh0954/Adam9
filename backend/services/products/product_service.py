@@ -6,8 +6,7 @@ class ProductService:
     
     @staticmethod
     def add_product(name: str, description: str, price: float) -> Product:
-        product = ProductRepository.add_product(name, description, price)
-        return product
+        return ProductRepository.add_product(name, description, price)
     
     @staticmethod
     def get_all_products() -> list[Product]:
@@ -19,9 +18,12 @@ class ProductService:
     
     @staticmethod
     def update_product(product_id: int, name: str, description: str, price: float) -> Product:
-        product = ProductRepository.update_product(product_id, name, description, price)
-        return product
+        return ProductRepository.update_product(product_id, name, description, price)
     
     @staticmethod
     def delete_product(product_id: int) -> bool:
         return ProductRepository.delete_product(product_id)
+    
+    @staticmethod
+    def search_products(query: str, page: int, per_page: int) -> list[Product]:
+        return ProductRepository.search_products(query, page, per_page)
