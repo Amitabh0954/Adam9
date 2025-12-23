@@ -2,6 +2,8 @@ from flask import Flask
 from backend.config.config import Config
 from backend.models.user import db
 from backend.models.product import Product
+from backend.models.category import Category
+from backend.models.product_category import product_category
 from backend.models.cart import Cart
 from backend.models.cart_item import CartItem
 from backend.controllers.auth.user_controller import auth_bp
