@@ -48,4 +48,3 @@ class UserService:
 
         user.set_password(new_password)
         db.session.commit()
-```
