@@ -40,3 +40,15 @@ def update_product(product_id):
         return jsonify({'message': 'Product updated successfully', 'product_id': product.id}), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
+
+@product_bp.route('/products/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    # Assuming there's a function to check if the user is an admin.
+    if not check_if_admin():
+        return jsonify({'error': 'Unauthorized access'}), 403
+
+    try:
+        ProductService.delete_product(product_id)
+        return jsonify({'message': 'Product deleted successfully'}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
