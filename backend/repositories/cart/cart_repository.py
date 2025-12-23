@@ -1,21 +1,26 @@
-from backend.models.cart import Cart, CartItem
-from backend.models import db
+from backend.models.cart import Cart
+from backend.models.cart_item import CartItem
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 class CartRepository:
+    """Repository for the Cart model"""
+    
     @staticmethod
-    def create_cart(user_id: int = None) -> Cart:
-        new_cart = Cart(user_id=user_id)
-        db.session.add(new_cart)
+    def create_cart(user_id: int) -> Cart:
+        cart = Cart(user_id=user_id)
+        db.session.add(cart)
         db.session.commit()
-        return new_cart
-
+        return cart
+    
     @staticmethod
-    def get_cart(cart_id: int) -> Cart:
-        return Cart.query.get(cart_id)
-
+    def get_cart_by_user_id(user_id: int) -> Cart:
+        return Cart.query.filter_by(user_id=user_id).first()
+    
     @staticmethod
-    def add_item_to_cart(cart: Cart, product_id: int, quantity: int) -> CartItem:
-        cart_item = CartItem(cart_id=cart.id, product_id=product_id, quantity=quantity)
+    def add_item_to_cart(cart_id: int, product_id: int, quantity: int) -> CartItem:
+        cart_item = CartItem(cart_id=cart_id, product_id=product_id, quantity=quantity)
         db.session.add(cart_item)
         db.session.commit()
         return cart_item
