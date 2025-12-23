@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from backend.services.auth.user_service import UserService
+from backend.services.auth.profile_service import ProfileService
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -66,3 +67,33 @@ def password_reset(token):
         return jsonify({'message': 'Password reset successfully'}), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
+
+@auth_bp.route('/profile', methods=['GET', 'PATCH'])
+def manage_profile():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'error': 'Unauthorized access'}), 403
+
+    if request.method == 'GET':
+        profile = ProfileService.get_profile(user_id)
+        return jsonify({
+            'user_id': profile.id,
+            'email': profile.email,
+            'created_at': profile.created_at
+        }), 200
+
+    if request.method == 'PATCH':
+        data = request.json
+        email = data.get('email')
+        new_password = data.get('new_password')
+
+        try:
+            profile = ProfileService.update_profile(user_id, email, new_password)
+            return jsonify({
+                'message': 'Profile updated successfully',
+                'user_id': profile.id,
+                'email': profile.email,
+                'created_at': profile.created_at
+            }), 200
+        except ValueError as e:
+            return jsonify({'error': str(e)}), 400
