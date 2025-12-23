@@ -7,4 +7,8 @@ class ProductService:
     @staticmethod
     def add_product(name: str, description: str, price: float) -> Product:
         return ProductRepository.add_product(name, description, price)
+
+    @staticmethod
+    def update_product(product_id: int, name: str, description: str, price: float) -> Product:
+        return ProductRepository.update_product(product_id, name, description, price)
 ```
