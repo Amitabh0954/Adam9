@@ -1,19 +1,22 @@
 from backend.models.user import User
-from backend.models import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 class UserRepository:
-    @staticmethod
-    def get_user_by_username(username: str) -> User:
-        return User.query.filter_by(username=username).first()
+    """Repository for the User model"""
 
     @staticmethod
     def get_user_by_email(email: str) -> User:
         return User.query.filter_by(email=email).first()
 
     @staticmethod
-    def create_user(username: str, email: str, password: str) -> User:
-        new_user = User(username=username, email=email)
-        new_user.set_password(password)
-        db.session.add(new_user)
+    def add_user(email: str, password: str) -> User:
+        if UserRepository.get_user_by_email(email):
+            raise ValueError('Email already registered')
+        
+        user = User(email=email)
+        user.set_password(password)
+        db.session.add(user)
         db.session.commit()
-        return new_user
+        return user
