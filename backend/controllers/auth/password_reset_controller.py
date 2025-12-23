@@ -1,26 +1,34 @@
 from flask import Blueprint, request, jsonify
 from backend.services.auth.password_reset_service import PasswordResetService
 
-password_reset_bp = Blueprint('password_reset', __name__)
+reset_bp = Blueprint('reset', __name__)
 
-@password_reset_bp.route('/request-reset', methods=['POST'])
-def request_reset():
-    data = request.get_json()
+@reset_bp.route('/reset-password', methods=['POST'])
+def request_password_reset():
+    data = request.json
     email = data.get('email')
-    try:
-        token = PasswordResetService.generate_reset_token(email)
-        # Here you would typically send an email to the user with the token
-        return jsonify({"message": "Password reset link sent", "token": token}), 200
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
+    
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
 
-@password_reset_bp.route('/reset-password', methods=['POST'])
-def reset_password():
-    data = request.get_json()
-    token = data.get('token')
+    user = UserService.get_user_by_email(email)
+    if not user:
+        return jsonify({'error': 'Invalid email'}), 400
+
+    PasswordResetService.send_reset_email(email)
+    return jsonify({'message': 'Password reset link sent'}), 200
+
+@reset_bp.route('/reset-password/<token>', methods=['POST'])
+def reset_password(token):
+    data = request.json
     new_password = data.get('new_password')
-    try:
-        PasswordResetService.reset_password(token, new_password)
-        return jsonify({"message": "Password has been reset successfully"}), 200
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
+
+    if not new_password:
+        return jsonify({'error': 'New password is required'}), 400
+
+    email = PasswordResetService.confirm_reset_token(token)
+    if not email:
+        return jsonify({'error': 'Invalid or expired token'}), 400
+
+    PasswordResetService.reset_password(email, new_password)
+    return jsonify({'message': 'Password has been reset'}), 200
