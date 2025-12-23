@@ -33,3 +33,12 @@ class CartRepository:
             db.session.commit()
             return True
         return False
+    
+    @staticmethod
+    def modify_item_quantity(cart_item_id: int, quantity: int) -> CartItem:
+        cart_item = CartItem.query.get(cart_item_id)
+        if cart_item:
+            cart_item.quantity = quantity
+            db.session.commit()
+            return cart_item
+        return None
