@@ -24,3 +24,19 @@ class UserService:
     @staticmethod
     def get_user_by_username(username: str) -> User:
         return UserRepository.get_user_by_username(username)
+        
+    @staticmethod
+    def get_user_by_email(email: str) -> User:
+        return UserRepository.get_user_by_email(email)
+        
+    @staticmethod
+    def update_user_profile(current_email: str, new_username: str, new_email: str) -> User:
+        user = UserRepository.get_user_by_email(current_email)
+        if user:
+            if new_email != current_email and UserRepository.get_user_by_email(new_email):
+                raise ValueError('Email already registered')
+            user.username = new_username
+            user.email = new_email
+            db.session.commit()
+            return user
+        raise ValueError('User not found')
