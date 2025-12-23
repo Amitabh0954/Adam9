@@ -2,6 +2,7 @@ from flask import Flask
 from backend.config.config import Config
 from backend.models.user import db
 from backend.controllers.auth.user_controller import auth_bp
+from backend.controllers.auth.login_controller import login_bp
 
 def create_app():
     app = Flask(__name__)
@@ -10,6 +11,7 @@ def create_app():
     db.init_app(app)
     
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    app.register_blueprint(login_bp, url_prefix='/api/auth')
     
     return app
 
