@@ -42,3 +42,11 @@ def update_product(product_id: int):
     if product:
         return jsonify({'id': product.id, 'name': product.name, 'description': product.description, 'price': product.price})
     return jsonify({'error': 'Product not found'}), 404
+
+@product_bp.route('/products/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id: int):
+    # Note: Admin authentication and confirmation logic should be added here
+    product = ProductService.delete_product(product_id)
+    if product:
+        return jsonify({'message': 'Product deleted successfully'})
+    return jsonify({'error': 'Product not found'}), 404
