@@ -52,3 +52,16 @@ def get_cart(cart_id):
     items = [{'product_id': item.product_id, 'quantity': item.quantity, 'price': item.product.price, 'total': item.product.price * item.quantity} for item in cart.items]
     total_price = sum(item['total'] for item in items)
     return jsonify({'cart_id': cart.id, 'user_id': cart.user_id, 'items': items, 'total_price': total_price}), 200
+
+@cart_bp.route('/user/<int:user_id>/cart', methods=['GET'])
+def get_user_cart(user_id):
+    try:
+        cart = CartService.get_cart_by_user_id(user_id)
+        if not cart:
+            return jsonify({'error': 'Cart not found for user'}), 404
+
+        items = [{'product_id': item.product_id, 'quantity': item.quantity, 'price': item.product.price, 'total': item.product.price * item.quantity} for item in cart.items]
+        total_price = sum(item['total'] for item in items)
+        return jsonify({'cart_id': cart.id, 'user_id': cart.user_id, 'items': items, 'total_price': total_price}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
