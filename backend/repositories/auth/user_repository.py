@@ -1,7 +1,11 @@
+from datetime import datetime, timedelta
 from backend.models.user import User
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
+SECRET_KEY = 'your-secret-key'
+serializer = URLSafeTimedSerializer(SECRET_KEY)
 
 class UserRepository:
     """Repository for the User model"""
@@ -24,3 +28,15 @@ class UserRepository:
     @staticmethod
     def get_user_by_id(user_id: int) -> User:
         return User.query.get(user_id)
+
+    @staticmethod
+    def create_password_reset_token(email: str) -> str:
+        return serializer.dumps(email, salt='password-reset-salt')
+
+    @staticmethod
+    def verify_password_reset_token(token: str, expiration=86400) -> str:
+        try:
+            email = serializer.loads(token, salt='password-reset-salt', max_age=expiration)
+        except SignatureExpired:
+            raise ValueError('The password reset link has expired')
+        return email
