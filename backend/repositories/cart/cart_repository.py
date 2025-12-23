@@ -24,3 +24,12 @@ class CartRepository:
         db.session.add(cart_item)
         db.session.commit()
         return cart_item
+    
+    @staticmethod
+    def remove_item_from_cart(cart_item_id: int) -> bool:
+        cart_item = CartItem.query.get(cart_item_id)
+        if cart_item:
+            db.session.delete(cart_item)
+            db.session.commit()
+            return True
+        return False
