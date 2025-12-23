@@ -19,3 +19,7 @@ class CartService:
         if not cart:
             cart = CartRepository.create_cart(user_id)
         return CartRepository.add_item_to_cart(cart.id, product_id, quantity)
+    
+    @staticmethod
+    def remove_item_from_cart(cart_item_id: int) -> bool:
+        return CartRepository.remove_item_from_cart(cart_item_id)
