@@ -1,17 +1,14 @@
-from backend.repositories.auth.user_repository import UserRepository
+from backend.repositories.auth.profile_repository import ProfileRepository
 from backend.models.user import User
 
 class ProfileService:
+    """Service class for user profile-related operations"""
+    
     @staticmethod
-    def update_profile(user_id: int, username: str, email: str, password: Optional[str] = None) -> User:
-        user = UserRepository.get_user_by_id(user_id)
-        if UserRepository.get_user_by_username(username) and user.username != username:
-            raise ValueError("Username must be unique")
-        if UserRepository.get_user_by_email(email) and user.email != email:
-            raise ValueError("Email must be unique")
-        user.username = username
-        user.email = email
-        if password:
-            user.set_password(password)
-        UserRepository.save_user(user)
+    def update_profile(user_id: int, username: str, email: str, image_file: str) -> User:
+        user = ProfileRepository.update_profile(user_id, username, email, image_file)
         return user
+    
+    @staticmethod
+    def get_profile(user_id: int) -> User:
+        return ProfileRepository.get_profile(user_id)
