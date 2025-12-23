@@ -1,26 +1,22 @@
 from flask import Blueprint, request, jsonify
 from backend.services.products.product_search_service import ProductSearchService
 
-product_search_bp = Blueprint('product_search', __name__)
+search_bp = Blueprint('search', __name__)
 
-@product_search_bp.route('/search', methods=['GET'])
+@search_bp.route('/search', methods=['GET'])
 def search_products():
-    query = request.args.get('query')
-    page = int(request.args.get('page', 1))
-    per_page = int(request.args.get('per_page', 10))
-    try:
-        pagination = ProductSearchService.search_products(query, page, per_page)
-        products = [{
-            'id': product.id,
-            'name': product.name,
-            'description': product.description,
-            'price': product.price
-        } for product in pagination.items]
-        return jsonify({
-            'products': products,
-            'total': pagination.total,
-            'pages': pagination.pages,
-            'current_page': pagination.page
-        }), 200
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
+    query = request.args.get('q')
+    page = request.args.get('page', default=1, type=int)
+    per_page = request.args.get('per_page', default=10, type=int)
+    
+    if not query:
+        return jsonify({'error': 'Search query is required'}), 400
+    
+    results, total = ProductSearchService.search_products(query, page, per_page)
+    
+    return jsonify({
+        'results': results,
+        'total': total,
+        'page': page,
+        'per_page': per_page
+    }), 200
