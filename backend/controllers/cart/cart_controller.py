@@ -21,3 +21,15 @@ def add_to_cart():
             'quantity': cart_item.quantity
         }
     }), 201
+
+@cart_bp.route('/cart/item/<int:item_id>', methods=['DELETE'])
+def remove_from_cart(item_id):
+    confirmed = request.args.get('confirmed', default='false').lower() == 'true'
+    if not confirmed:
+        return jsonify({'error': 'Confirmation required'}), 400
+
+    try:
+        CartService.remove_from_cart(item_id)
+        return jsonify({'message': 'Product removed from cart'}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
