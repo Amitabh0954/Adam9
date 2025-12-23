@@ -23,3 +23,7 @@ class CartService:
     @staticmethod
     def remove_item_from_cart(cart_item_id: int) -> bool:
         return CartRepository.remove_item_from_cart(cart_item_id)
+    
+    @staticmethod
+    def modify_item_quantity(cart_item_id: int, quantity: int) -> CartItem:
+        return CartRepository.modify_item_quantity(cart_item_id, quantity)
