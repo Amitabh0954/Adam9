@@ -39,3 +39,11 @@ class ProductRepository:
             db.session.commit()
             return True
         return False
+
+    @staticmethod
+    def search_products(query: str, page: int, per_page: int) -> list[Product]:
+        search_query = "%{}%".format(query)
+        return Product.query.filter(
+            Product.name.ilike(search_query) |
+            Product.description.ilike(search_query)
+        ).paginate(page=page, per_page=per_page, error_out=False).items
