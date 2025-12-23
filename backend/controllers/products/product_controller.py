@@ -43,3 +43,11 @@ def update_product(product_id):
         }), 200
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
+
+@product_bp.route('/products/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    try:
+        ProductService.delete_product(product_id)
+        return jsonify({'message': 'Product deleted successfully'}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
