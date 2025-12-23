@@ -38,3 +38,31 @@ def login():
 def logout():
     session.pop('user_id', None)
     return jsonify({'message': 'Logged out successfully'}), 200
+
+@auth_bp.route('/password-reset', methods=['POST'])
+def password_reset_request():
+    data = request.json
+    email = data.get('email')
+
+    if not email:
+        return jsonify({'error': 'Email is required'}), 400
+
+    try:
+        UserService.send_password_reset_email(email)
+        return jsonify({'message': 'Password reset email sent'}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
+@auth_bp.route('/password-reset/<token>', methods=['POST'])
+def password_reset(token):
+    data = request.json
+    new_password = data.get('new_password')
+
+    if not new_password:
+        return jsonify({'error': 'New password is required'}), 400
+
+    try:
+        UserService.reset_password(token, new_password)
+        return jsonify({'message': 'Password reset successfully'}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
