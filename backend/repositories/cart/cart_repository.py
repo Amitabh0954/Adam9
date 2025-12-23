@@ -34,3 +34,12 @@ class CartRepository:
             raise ValueError('Cart item not found')
         db.session.delete(cart_item)
         db.session.commit()
+
+    @staticmethod
+    def update_cart_item_quantity(item_id: int, quantity: int) -> CartItem:
+        cart_item = CartItem.query.get(item_id)
+        if not cart_item:
+            raise ValueError('Cart item not found')
+        cart_item.quantity = quantity
+        db.session.commit()
+        return cart_item
