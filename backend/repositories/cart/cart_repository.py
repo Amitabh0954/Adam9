@@ -19,6 +19,10 @@ class CartRepository:
         return Cart.query.get(cart_id)
 
     @staticmethod
+    def get_cart_by_user_id(user_id: int) -> Cart:
+        return Cart.query.filter_by(user_id=user_id).first()
+
+    @staticmethod
     def add_to_cart(cart_id: int, product_id: int, quantity: int = 1) -> None:
         cart = CartRepository.get_cart(cart_id)
         if not cart:
