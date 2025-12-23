@@ -31,6 +31,18 @@ def remove_from_cart(cart_id, product_id):
     except ValueError as e:
         return jsonify({'error': str(e)}), 400
 
+@cart_bp.route('/cart/<int:cart_id>/items/<int:product_id>', methods=['PATCH'])
+def modify_quantity(cart_id, product_id):
+    quantity = request.json.get('quantity')
+    if quantity is None or quantity <= 0:
+        return jsonify({'error': 'Quantity must be a positive integer'}), 400
+
+    try:
+        CartService.modify_quantity(cart_id, product_id, quantity)
+        return jsonify({'message': 'Product quantity updated', 'cart_id': cart_id, 'product_id': product_id, 'quantity': quantity}), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+
 @cart_bp.route('/cart/<int:cart_id>', methods=['GET'])
 def get_cart(cart_id):
     cart = CartService.get_cart(cart_id)
