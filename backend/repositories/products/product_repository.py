@@ -1,11 +1,12 @@
 from backend.models.product import Product
+from sqlalchemy import or_
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 class ProductRepository:
     """Repository for the Product model"""
-
+    
     @staticmethod
     def get_product_by_name(name: str) -> Product:
         return Product.query.filter_by(name=name).first()
@@ -49,3 +50,13 @@ class ProductRepository:
             raise ValueError('Product not found')
         db.session.delete(product)
         db.session.commit()
+
+    @staticmethod
+    def search_products(query: str, page: int = 1, per_page: int = 10):
+        search = f"%{query}%"
+        products_query = Product.query.filter(
+            or_(Product.name.ilike(search), Product.description.ilike(search))
+        )
+        total = products_query.count()
+        products = products_query.paginate(page, per_page, False).items
+        return products, total
