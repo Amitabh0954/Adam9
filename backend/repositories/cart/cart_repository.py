@@ -36,3 +36,12 @@ class CartRepository:
 
         db.session.add(cart_item)
         db.session.commit()
+
+    @staticmethod
+    def remove_from_cart(cart_id: int, product_id: int) -> None:
+        cart_item = CartItem.query.filter_by(cart_id=cart_id, product_id=product_id).first()
+        if not cart_item:
+            raise ValueError('Cart item not found')
+
+        db.session.delete(cart_item)
+        db.session.commit()
