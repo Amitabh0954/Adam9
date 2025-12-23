@@ -15,4 +15,8 @@ class CartService:
     @staticmethod
     def add_to_cart(cart_id: int, product_id: int, quantity: int = 1) -> None:
         CartRepository.add_to_cart(cart_id, product_id, quantity)
+
+    @staticmethod
+    def remove_from_cart(cart_id: int, product_id: int) -> None:
+        CartRepository.remove_from_cart(cart_id, product_id)
 ```
