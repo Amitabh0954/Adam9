@@ -1,15 +1,18 @@
 from flask import Blueprint, request, jsonify
-from backend.services.auth.login_service import LoginService
+from werkzeug.security import check_password_hash
+from backend.repositories.auth.user_repository import UserRepository
+from backend.services.auth.session_service import SessionService
 
 login_bp = Blueprint('login', __name__)
 
 @login_bp.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
-    username = data.get('username')
+    data = request.json
+    email = data.get('email')
     password = data.get('password')
-    try:
-        session_id = LoginService.login(username, password)
-        return jsonify({"message": "Login successful", "session_id": session_id}), 200
-    except ValueError as e:
-        return jsonify({"message": str(e)}), 400
+    
+    user = UserRepository.get_user_by_email(email)
+    if user and check_password_hash(user.password, password):
+        session = SessionService.create_session(user.id)
+        return jsonify({'id': user.id, 'username': user.username, 'email': user.email, 'token': session.token})
+    return jsonify({'error': 'Invalid credentials'}), 401
